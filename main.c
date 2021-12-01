@@ -82,6 +82,19 @@ void	quit(int a, int **tab, int x_size)
 	}
 }
 
+void	free_doublechar(char **str)
+{
+	int i;
+
+	i = 0;
+	while (str[i])
+	{
+		free(str[i]);
+		i++;
+	}
+	free(str);
+}
+
 void check_map(t_map *map, char **argv)
 {
 	int fd;
@@ -104,11 +117,12 @@ void check_map(t_map *map, char **argv)
 		line = NULL;
 		while (parse_line[map->x_size] && !(map->y_size))
 			(map->x_size)++;
-		free(parse_line);
+		free_doublechar(parse_line);
 		parse_line = NULL;
 		(map->y_size)++;
 		gnl = get_next_line(fd, &line);
 	}
+	free(line);
 	if (close(fd) || gnl < 0)
 		quit(1, 0, 0);
 }
@@ -118,20 +132,20 @@ int	**alloc_tab(int x_size, int y_size)
 	int **tab;
 	int i;
 
-	tab = malloc(sizeof(int) * x_size);
+	tab = malloc(sizeof(int*) * x_size);
 	if (!tab)
 		quit(1, 0, 0);
-	i = -1;
-	while (++i < x_size)
+	i = 0;
+	while (i < x_size)
 	{
-		tab[i] = malloc(sizeof(int) * y_size);
-		if (!tab[i])
-		{
-			while (i--)
-				free(tab[i]);
-			free(tab);
-			quit(1, 0, 0);
-		}
+		tab[i++] = malloc(sizeof(int) * y_size);
+//		if (!tab[i])
+//		{
+//			while (i--)
+//				free(tab[i]);
+//			free(tab);
+//			quit(1, 0, 0);
+//		}
 	}
 	return (tab);
 }
@@ -152,19 +166,47 @@ void	fill_tab(int **tab, t_map map, char **argv)
 	gnl = get_next_line(fd, &line);
 	j = 0;
 	while (gnl > 0)
-	{
+	{	
 		parse_line = ft_split(line, ' ');
+		free(line);
 		if (!parse_line)
 			quit(1, tab, map.x_size);
 		i = -1;
 		while (parse_line[++i])
 			tab[j][i] = atoi(parse_line[i]);
-		free(parse_line);
+		free_doublechar(parse_line);
 		parse_line = NULL;
 		gnl = get_next_line(fd, &line);
 		j++;
 	}
 	free (line);
+	if (close(fd) || gnl < 0)
+		quit(1, 0, 0);
+}
+
+void free_tab(int **tab, t_map map)
+{
+	int i;
+
+	i = 0;
+	while (i < map.x_size)
+		free(tab[i++]);
+	free(tab);
+}
+
+void print_map(int **tab, t_map map)
+{
+	int i;
+	int j;
+
+	i = -1;
+	while (++i < map.y_size)
+	{
+		j = -1;
+		while (++j < map.x_size)
+			printf("%d ", tab[i][j]);
+		printf("\n");
+	}
 }
 
 int main(int argc, char **argv)
@@ -177,7 +219,11 @@ int main(int argc, char **argv)
 	check_map(&map, argv);
 	tab = alloc_tab(map.x_size, map.y_size);
 	fill_tab(tab, map, argv);
+	//	free(*tab);
+	print_map(tab, map);	
+	free_tab(tab, map);
 
+//	printf("%d", tab[0][0]);
 	return (0);
 }
 /*
