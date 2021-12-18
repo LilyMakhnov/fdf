@@ -4,7 +4,8 @@
 #include "get_next_line.h"
 #include <math.h>
 
-typedef struct	s_data {
+typedef struct s_data
+{
 	void	*img;
 	char	*addr;
 	int		bits_per_pixel;
@@ -14,67 +15,55 @@ typedef struct	s_data {
 
 typedef struct s_env
 {
-	void *mlx;
-	void *win;
-	t_data img;
+	void	*mlx;
+	void	*win;
+	t_data	img;
 }	t_env;
 
 typedef struct s_offset
 {
-	int x_min;
-	int y_min;
-	int x_max;
-	int y_max;
+	int	x_min;
+	int	y_min;
+	int	x_max;
+	int	y_max;
 }	t_offset;
 
 typedef struct s_point
 {
-	float x;
-	float y;
-	int x3d;
-	int y3d;
-	int z3d;
+	float	x;
+	float	y;
+	int		x3d;
+	int		y3d;
+	int		z3d;
 }	t_point;
 
 typedef struct s_map
 {
-	int x_size;
-	int y_size;
-	int z_size;
-	int z_max;
-	int z_min;
-	int scale;
-	int offset_x;
-	int offset_y;
-	t_offset offset;
-	t_point pt1;
-	t_point pt2;
+	int			x_size;
+	int			y_size;
+	int			z_size;
+	int			z_max;
+	int			z_min;
+	int			scale;
+	int			offset_x;
+	int			offset_y;
+	t_offset	offset;
+	t_point		pt1;
+	t_point		pt2;
 }	t_map;
 
-int max(int a, int b)
-{
-	if (a > b)
-		return (a);
-	else 
-		return (b);
-}
-
-int min(int a, int b)
+int	min(int a, int b)
 {
 	if (a < b)
 		return (a);
-	else 
+	else
 		return (b);
 }
 
 void	quit(int a, int **tab, int x_size)
 {
 	if (tab)
-	{
-		while (x_size--)
-			free(tab[x_size]);
-		free(tab);
-	}
+		free_tab(tab, x_size);
 	if (a == 1)
 	{
 		write (2, "ERROR\n", 6);
@@ -89,139 +78,134 @@ void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
 	char	*dst;
 
 	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
-	*(unsigned int*)dst = color;
+	*(unsigned int *)dst = color;
 }
 
-double dist(double x0, double x1, double y0, double y1)
+float	ft_dist(float x0, float x1, float y0, float y1)
 {
 	return (sqrt(pow(x1 - x0, 2) + pow(y1 - y0, 2)));
 }
 
-void	plotLineLow(t_data *data, t_point pt0, t_point pt1,  t_map map)
+int	rgb(int red, int green, int blue)
 {
-	int D;
-	int x;
-	int y;
-	double color;
-	double max;
-	double delta_color;
+	return (red * 0x010000 + green * 0x000100 + blue * 0x000001);
+}
 
-	max = dist(pt0.x, pt1.x, pt0.y, pt1.y);
+unsigned int	ft_hsl(unsigned int i)
+{
+	i = i % 360;
+	if (i < 60)
+		return (rgb(255, i * 4.25, 0));
+	if (i < 120)
+		return (rgb(255 - (i - 60) * 4.25, 255, 0));
+	if (i < 180)
+		return (rgb(0, 255, (i - 120) * 4.25));
+	if (i < 240)
+		return (rgb(0, 255 - (i - 180) * 4.25, 255));
+	if (i < 300)
+		return (rgb((i - 240) * 4.25, 0, 255));
+	else
+		return (rgb(255, 0, 255 - (i - 300) * 4.25));
+}
 
- 	D = 2 * abs((int)pt1.y - (int)pt0.y) - (pt1.x - pt0.x);
+int	color_z(t_point pt0, t_point pt1, t_map map, float dist)
+{
+	float	ret;
+	float	color;
+	float	color_max;
+
+	if (map.z_max != map.z_min)
+	{
+		color = (pt0.z3d - map.z_min) * 320 / (map.z_max - map.z_min);
+		color_max = (pt1.z3d - map.z_min) * 320 / (map.z_max - map.z_min);
+		ret = color + dist / ft_dist(pt0.x, pt1.x, pt0.y, pt1.y) 
+				* (color_max - color);
+		return (ft_hsl((int)ret));
+	}
+	return (ft_hsl(0));
+}
+
+void	plot_line_low(t_data *data, t_point pt0, t_point pt1,  t_map map)
+{
+	int		delta;
+	int		x;
+	int		y;
+	float	dist;
+
+ 	delta = 2 * abs((int)pt1.y - (int)pt0.y) - (pt1.x - pt0.x);
 	y = pt0.y;
 	x = pt0.x;
-
-	color =  0xff0000 + ((double)(pt0.z3d - map.z_min) * 255 / (map.z_max - map.z_min));
-	delta_color =  ((double)(pt0.z3d - pt1.z3d) * 255 / (map.z_max - map.z_min));
 	while (x < pt1.x)
 	{
-   		my_mlx_pixel_put(data, x, y, color + (int)((max - dist(pt0.x, x, pt0.y, y)) * delta_color) / max ); 
-   	   	if (D > 0)
+		dist = ft_dist(pt0.x, x, pt0.y, y);
+		my_mlx_pixel_put(data, x, y, color_z(pt0, pt1, map, dist));
+   	   	if (delta > 0)
 		{
 			if (pt1.y > pt0.y)
    	      	 	y++;
 			else
 				y--;
-   	       	D = D + (2 * (abs((int)pt1.y - (int)pt0.y) - (pt1.x - pt0.x)));
+   	       	delta += (2 * (abs((int)pt1.y - (int)pt0.y) - (pt1.x - pt0.x)));
 		}
    	   	else
-   	       	D = D + 2 * abs((int)pt1.y - (int)pt0.y);
+   	       	delta += 2 * abs((int)pt1.y - (int)pt0.y);
 		x++;
 	}
 }
 
-void	plotLineHigh(t_data *data, t_point pt0, t_point pt1, t_map map)
+void	plot_line_high(t_data *data, t_point pt0, t_point pt1, t_map map)
 {
-	int D;
-	int x;
-	int y;
-	int color;
-	double max;
-	int delta_color;
+	int		delta;
+	int		x;
+	int		y;
+	float	dist;
 
-	max = dist(pt0.x, pt1.x, pt0.y, pt1.y);
-	D = 2 * abs((int)pt1.x - (int)pt0.x) - (pt1.y - pt0.y);
+	delta = 2 * abs((int)pt1.x - (int)pt0.x) - (pt1.y - pt0.y);
 	x = pt0.x;
 	y = pt0.y;
-
-	color =  0xff0000 + (double)(pt0.z3d - map.z_min) * 255 / (map.z_max - map.z_min);
-	delta_color =  (double)(pt0.z3d - pt1.z3d) * 255/(map.z_max - map.z_min);
 	while (y < pt1.y)
 	{
-	    my_mlx_pixel_put(data, x, y, color + (max - dist(pt0.x, x, pt0.y, y)) / max  * delta_color);
-        if (D > 0)
+	    dist = ft_dist(pt0.x, x, pt0.y, y);
+		my_mlx_pixel_put(data, x, y, color_z(pt0, pt1, map, dist));
+        if (delta > 0)
 		{
             if (pt1.x > pt0.x)
    	      	 	x++;
 			else
 				x--;
-            D = D + (2 * (abs((int)pt1.x - (int)pt0.x) - (pt1.y - pt0.y)));
+            delta += (2 * (abs((int)pt1.x - (int)pt0.x) - (pt1.y - pt0.y)));
 		}
         else
-            D = D + 2*abs((int)pt1.x - (int)pt0.x);
+            delta += 2*abs((int)pt1.x - (int)pt0.x);
 		y++;
 	}
 }
 
-void drawline(t_data *data, t_point pt0, t_point pt1, t_map map)
+void	drawline(t_data *data, t_point pt0, t_point pt1, t_map map)
 {
     if (abs((int)pt1.y - (int)pt0.y) < abs((int)pt1.x - (int)pt0.x))
         if (pt0.x > pt1.x)
-            plotLineLow(data, pt1, pt0, map);
+            plot_line_low(data, pt1, pt0, map);
         else
-            plotLineLow(data, pt0, pt1, map);
+            plot_line_low(data, pt0, pt1, map);
     else
         if (pt0.y > pt1.y)
-            plotLineHigh(data, pt1, pt0, map);
+            plot_line_high(data, pt1, pt0, map);
         else
-            plotLineHigh(data, pt0, pt1, map);
+            plot_line_high(data, pt0, pt1, map);
 }
 
-void	draw_line(t_data *data, t_point pt1, t_point pt2)
+float	x_proj(t_map map, int x, int y)
 {
-	float a;
-	float b;
-	int x;
-	int y;
-
-	if (pt1.x != pt2.x)
-	{
-		a = (float)(pt2.y - pt1.y)/(pt2.x - pt1.x);
-		b = (float)(pt2.x * pt1.y - pt1.x * pt2.y)/(pt2.x - pt1.x);
-		x = min(pt1.x, pt2.x) - 1; 
-		while (++x < max(pt1.x, pt2.x))
-			my_mlx_pixel_put(data, x, (int)(x * a + b) , 0x00FFF000 );
-		y = min(pt1.y, pt2.y) + 1; 
-		while (++y < max(pt1.y, pt2.y))
-			if (a != 0)
-				my_mlx_pixel_put(data, (int)(y - b)/a, y , 0x00FFF000 );
-	}
-	else
-	{
-		y = min(pt1.y, pt2.y);
-		while (y < max(pt1.y, pt2.y))
-			my_mlx_pixel_put(data, pt1.x, y++, 0x00FFF000 );
-	}
-}
-
-void map_init(t_map *map)
-{
-	map->x_size = 0;
-	map->y_size = 0;
-}
-
-float x_proj(t_map map, int x, int y)
-{
-	float ret;
+	float	ret;
 
 	ret = 1.4142/2 * ((float)x - (float)y);
 	return (map.scale * ret);
 }
 
-float y_proj(t_map map, int x, int y, int z)
+float	y_proj(t_map map, int x, int y, int z)
 {
-	float ret;
+	float	ret;
 
 	ret = 1.4142/1.7321 * (float)y + 1/2.4495 * ((float)x - (float)z);
 	return (map.scale * ret);
@@ -229,7 +213,7 @@ float y_proj(t_map map, int x, int y, int z)
 
 t_point	set_point(t_map map, int **tab, int i, int j)
 {
-	t_point pnt;
+	t_point	pnt;
 
 	pnt.x = map.offset_x + x_proj(map, i, j);
 	pnt.y = map.offset_y + y_proj(map, i, j, tab[i][j]); 
@@ -241,8 +225,8 @@ t_point	set_point(t_map map, int **tab, int i, int j)
 
 t_offset	shift_offset(int **tab, t_map map)
 {
-	t_offset offset;
-	int i;
+	t_offset	offset;
+	int			i;
 
 	map.pt1 = set_point(map, tab, map.x_size - 1, map.y_size - 1);
 	offset.x_min = map.pt1.x;
@@ -270,8 +254,8 @@ t_offset	shift_offset(int **tab, t_map map)
 
 void	draw_map(int **tab, t_map map, t_data *img)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	j = -1;
 	while (++j < map.y_size)
@@ -297,19 +281,19 @@ void	draw_map(int **tab, t_map map, t_data *img)
 	}
 }
 
-void free_tab(int **tab, t_map map)
+void	free_tab(int **tab, int size)
 {
-	int i;
+	int	i;
 
 	i = 0;
-	while (i < map.x_size)
+	while (i < size)
 		free(tab[i++]);
 	free(tab);
 }
 
 void	free_doublechar(char **str)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (str[i])
@@ -320,10 +304,10 @@ void	free_doublechar(char **str)
 	free(str);
 }
 
-int check_line(int fd, char **line, t_map *map)
+int	check_line(int fd, char **line, t_map *map)
 {
-	char **parse_line;
-	int i;
+	char	**parse_line;
+	int		i;
 
 	parse_line = ft_split(*line, ' ');
 	if (!parse_line)
@@ -350,11 +334,11 @@ int check_line(int fd, char **line, t_map *map)
 }
 
 
-void check_map(t_map *map, char **argv)
+void	check_map(t_map *map, char **argv)
 {
-	int fd;
-	int gnl;
-	char *line;
+	int		fd;
+	int		gnl;
+	char	*line;
 
 	map->x_size = 0;
 	map->y_size = 0;
@@ -363,7 +347,6 @@ void check_map(t_map *map, char **argv)
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
 		quit(1, 0, 0);
-	map_init(map);
 	line = NULL;
 	gnl = get_next_line(fd, &line);
 	while(gnl > 0)
@@ -375,8 +358,8 @@ void check_map(t_map *map, char **argv)
 
 int	**alloc_tab(int x_size, int y_size)
 {
-	int **tab;
-	int i;
+	int	**tab;
+	int	i;
 
 	tab = malloc(sizeof(int*) * x_size);
 	if (!tab)
@@ -398,9 +381,9 @@ int	**alloc_tab(int x_size, int y_size)
 
 int	fill_xtab(int **tab, int fd, char **line, t_map map)
 {
-		char **parse_line;
-		static int j = 0;
-		int i;
+		char		**parse_line;
+		static int	j = 0;
+		int			i;
 
 		if (j == map.y_size)
 			j = 0;
@@ -419,9 +402,9 @@ int	fill_xtab(int **tab, int fd, char **line, t_map map)
 
 void	fill_tab(int **tab, t_map map, char **argv)
 {
-	int fd;
-	int gnl;
-	char *line;
+	int		fd;
+	int		gnl;
+	char	*line;
 
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
@@ -447,45 +430,75 @@ int	key_hook(int keycode, t_env *param)
 	return (0);
 }
 
-int main(int argc, char **argv)
+int	create_env(t_env *fdf, char *str)
 {
-	t_env fdf;
-	int	**tab;
-	t_map map;
-	t_offset off;
+	fdf->mlx = mlx_init();
+	if (!fdf->mlx)
+		return (0);
+	fdf->win = mlx_new_window(fdf->mlx, 1920, 1080, str);
+	if (!fdf->win)
+		return (0);
+	fdf->img.img = mlx_new_image(fdf->mlx, 1920, 1080);
+	if (!fdf->img.img)
+		return (0);
+	fdf->img.addr = mlx_get_data_addr(fdf->img.img, &fdf->img.bits_per_pixel, &fdf->img.line_length,
+								&fdf->img.endian);
+	if (!fdf->img.addr)
+		return (0);
+	return (1);
+}
+
+void	ft_frame(int **tab, t_map *map)
+{
+	t_offset	off;
+
+	map->offset_x = 1920 / 2;
+	map->offset_y = 1080 / 2;
+	map->scale = 1;
+	off = shift_offset(tab, *map);
+	map->scale = min(1920 / (off.x_max-off.x_min), 1080 / (off.y_max-off.y_min)) * 0.8;
+	if (map->scale < 1)
+		map->scale = 1;
+	off = shift_offset(tab, *map);
+	map->offset_x = 2 * map->offset_x - (off.x_max + off.x_min)/2;
+	map->offset_y = 2 * map->offset_y - (off.y_max + off.y_min)/2;
+}
+
+void	free_env(t_env *fdf)
+{
+	if (fdf->mlx)
+		{
+			if (fdf->win)
+				mlx_destroy_window (fdf->mlx, fdf->win);
+			if (fdf->img.img)
+				mlx_destroy_image (fdf->mlx, fdf->img.img);
+			free(fdf->mlx);
+		}
+}
+
+int	main(int argc, char **argv)
+{
+	t_env	fdf;
+	int		**tab;
+	t_map	map;
 
 	if (argc != 2)
 		return (0);
 	check_map(&map, argv);
-	map.offset_x = 1920 / 2;
-	map.offset_y = 1080 / 2;
-	map.scale = 1;
 	tab = alloc_tab(map.x_size, map.y_size);
 	fill_tab(tab, map, argv);
-	fdf.mlx = mlx_init();
-	if (!fdf.mlx)
+	if (!create_env(&fdf, argv[1]))
+	{
+		free_tab(tab, map.x_size);
+		free_env(&fdf);
 		return (0);
-	fdf.win = mlx_new_window(fdf.mlx, 1920, 1080, "FdF");
-	if (!fdf.win)
-		return (0);
-	fdf.img.img = mlx_new_image(fdf.mlx, 1920, 1080);
-	fdf.img.addr = mlx_get_data_addr(fdf.img.img, &fdf.img.bits_per_pixel, &fdf.img.line_length,
-								&fdf.img.endian);
-	off = shift_offset(tab, map);
-	map.scale = min(1920 / (off.x_max-off.x_min), 1080 / (off.y_max-off.y_min)) * 0.8;
-	if (map.scale < 1)
-		map.scale = 1;
-	off = shift_offset(tab, map);
-	map.offset_x = 2 * map.offset_x - (off.x_max + off.x_min)/2;
-	map.offset_y = 2 * map.offset_y - (off.y_max + off.y_min)/2;
-	off = shift_offset(tab, map);
+	}
+	ft_frame(tab, &map);
 	draw_map(tab, map, &fdf.img);
+	free_tab(tab, map.x_size);
 	mlx_put_image_to_window(fdf.mlx, fdf.win, fdf.img.img, 0, 0);
-	free_tab(tab, map);
-
 	mlx_key_hook (fdf.win, &key_hook, &fdf);
 	mlx_loop(fdf.mlx);
-
-	free(fdf.mlx);
+	free_env(&fdf);
 	return (0);
 }
