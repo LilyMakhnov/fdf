@@ -53,8 +53,6 @@ t_offset	shift_offset(int **tab, t_map map)
 	return (offset);
 }
 
-#include <stdio.h>
-
 void	ft_frame(int **tab, t_map *map)
 {
 	t_offset	off;

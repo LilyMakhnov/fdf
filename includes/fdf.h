@@ -64,7 +64,7 @@ typedef struct s_map
 	int			z_size;
 	int			z_max;
 	int			z_min;
-	float			scale;
+	float		scale;
 	int			offset_x;
 	int			offset_y;
 	t_offset	offset;
