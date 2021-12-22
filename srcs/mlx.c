@@ -29,7 +29,6 @@ int	key_hook(int keycode, t_env *param)
 	if (keycode == 65307)
 	{
 		mlx_destroy_image (param->mlx, param->img.img);
-		mlx_clear_window(param->mlx, param->win);
 		mlx_destroy_window (param->mlx, param->win);
 		mlx_destroy_display(param->mlx);
 		free(param->mlx);

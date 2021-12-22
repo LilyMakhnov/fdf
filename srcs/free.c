@@ -56,6 +56,7 @@ void	free_env(t_env *fdf)
 			mlx_destroy_window (fdf->mlx, fdf->win);
 		if (fdf->img.img)
 			mlx_destroy_image (fdf->mlx, fdf->img.img);
+		mlx_destroy_display(fdf->mlx);
 		free(fdf->mlx);
 	}
 }

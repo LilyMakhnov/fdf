@@ -102,6 +102,7 @@ float			ft_dist(float x0, float x1, float y0, float y1);
 float			x_proj(t_map map, int x, int y);
 float			y_proj(t_map map, int x, int y, int z);
 int				min(int a, int b);
+int				ft_abs(int a);
 
 //free.c
 void			free_tab(int **tab, int size);
