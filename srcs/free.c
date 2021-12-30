@@ -28,7 +28,7 @@ void	quit(int a, int **tab, int x_size)
 		free_tab(tab, x_size);
 	if (a == 1)
 	{
-		write (2, "ERROR\n", 6);
+		write (2, "Error\n", 6);
 		exit(1);
 	}
 	else

@@ -40,3 +40,11 @@ float	y_proj(t_map map, int x, int y, int z)
 	ret = 1.4142 / 1.7321 * (float)y + 1 / 2.4495 * ((float)x - (float)z);
 	return (map.scale * ret);
 }
+
+int	ft_abs(int a)
+{
+	if (a < 0)
+		return (-a);
+	else
+		return (a);
+}

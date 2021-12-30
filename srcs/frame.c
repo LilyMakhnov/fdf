@@ -29,7 +29,7 @@ t_offset	shift_offset(int **tab, t_map map)
 	t_offset	offset;
 	int			i;
 
-	map.pt1 = set_point(map, tab, map.x_size - 1, map.y_size - 1);
+	map.pt1 = set_point(map, tab, 0, 0);
 	offset.x_min = map.pt1.x;
 	offset.y_min = map.pt1.y;
 	offset.x_max = map.pt1.x;
@@ -61,8 +61,9 @@ void	ft_frame(int **tab, t_map *map)
 	map->offset_y = WINDOW_HEIGHT / 2;
 	map->scale = 1;
 	off = shift_offset(tab, *map);
-	map->scale = min(WINDOW_WIDTH / (off.x_max - off.x_min),
-			WINDOW_HEIGHT / (off.y_max - off.y_min)) * 0.80;
+	if (off.x_max != off.x_min && off.y_max != off.y_min)
+		map->scale = min(WINDOW_WIDTH / (off.x_max - off.x_min),
+				WINDOW_HEIGHT / (off.y_max - off.y_min)) * 0.80;
 	if (map->scale < 1)
 		map->scale = 1;
 	off = shift_offset(tab, *map);

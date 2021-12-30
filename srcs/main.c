@@ -19,7 +19,7 @@ int	main(int argc, char **argv)
 	t_map	map;
 
 	if (argc != 2)
-		return (0);
+		quit(1, 0, 0);
 	check_map(&map, argv);
 	tab = alloc_tab(map.x_size, map.y_size);
 	fill_tab(tab, map, argv);

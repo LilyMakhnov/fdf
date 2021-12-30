@@ -19,7 +19,7 @@ void	plot_line_low(t_data *data, t_point pt0, t_point pt1, t_map map)
 	int		y;
 	float	dist;
 
-	delta = 2 * abs((int)pt1.y - (int)pt0.y) - (pt1.x - pt0.x);
+	delta = 2 * ft_abs((int)pt1.y - (int)pt0.y) - (pt1.x - pt0.x);
 	y = pt0.y;
 	x = pt0.x;
 	while (x < pt1.x)
@@ -32,10 +32,10 @@ void	plot_line_low(t_data *data, t_point pt0, t_point pt1, t_map map)
 				y++;
 			else
 				y--;
-			delta += 2 * (abs((int)pt1.y - (int)pt0.y) - (pt1.x - pt0.x));
+			delta += 2 * (ft_abs((int)pt1.y - (int)pt0.y) - (pt1.x - pt0.x));
 		}
 		else
-			delta += 2 * abs((int)pt1.y - (int)pt0.y);
+			delta += 2 * ft_abs((int)pt1.y - (int)pt0.y);
 		x++;
 	}
 }
@@ -47,7 +47,7 @@ void	plot_line_high(t_data *data, t_point pt0, t_point pt1, t_map map)
 	int		y;
 	float	dist;
 
-	delta = 2 * abs((int)pt1.x - (int)pt0.x) - (pt1.y - pt0.y);
+	delta = 2 * ft_abs((int)pt1.x - (int)pt0.x) - (pt1.y - pt0.y);
 	x = pt0.x;
 	y = pt0.y;
 	while (y < pt1.y)
@@ -60,17 +60,17 @@ void	plot_line_high(t_data *data, t_point pt0, t_point pt1, t_map map)
 				x++;
 			else
 				x--;
-			delta += 2 * (abs((int)pt1.x - (int)pt0.x) - (pt1.y - pt0.y));
+			delta += 2 * (ft_abs((int)pt1.x - (int)pt0.x) - (pt1.y - pt0.y));
 		}
 		else
-			delta += 2 * abs((int)pt1.x - (int)pt0.x);
+			delta += 2 * ft_abs((int)pt1.x - (int)pt0.x);
 		y++;
 	}
 }
 
 void	drawline(t_data *data, t_point pt0, t_point pt1, t_map map)
 {
-	if (abs((int)pt1.y - (int)pt0.y) < abs((int)pt1.x - (int)pt0.x))
+	if (ft_abs((int)pt1.y - (int)pt0.y) < ft_abs((int)pt1.x - (int)pt0.x))
 	{
 		if (pt0.x > pt1.x)
 			plot_line_low(data, pt1, pt0, map);

@@ -59,7 +59,7 @@ void	check_map(t_map *map, char **argv)
 	while (gnl > 0)
 		gnl = check_line(fd, &line, map);
 	free(line);
-	if (close(fd) || gnl < 0)
+	if (close(fd) || gnl < 0 || (map->x_size == 1 && map->y_size == 1))
 		quit(1, 0, 0);
 }
 
