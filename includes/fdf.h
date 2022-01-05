@@ -6,7 +6,7 @@
 /*   By: esivre <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/21 11:47:14 by esivre            #+#    #+#             */
-/*   Updated: 2021/12/22 12:14:22 by esivre           ###   ########.fr       */
+/*   Updated: 2022/01/05 15:29:28 by esivre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 # include "libft.h"
 # include "mlx.h"
-# include <stdio.h>
 # include <fcntl.h>
 # include <math.h>
 
