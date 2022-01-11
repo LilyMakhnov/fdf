@@ -25,10 +25,10 @@ int	check_line(int fd, char **line, t_map *map)
 	i = 0;
 	while (parse_line[i])
 	{
-		if (atoi(parse_line[i]) > map->z_max)
-			map->z_max = atoi(parse_line[i]);
-		if (atoi(parse_line[i]) < map->z_min)
-			map->z_min = atoi(parse_line[i]);
+		if (ft_atoi(parse_line[i]) > map->z_max)
+			map->z_max = ft_atoi(parse_line[i]);
+		if (ft_atoi(parse_line[i]) < map->z_min)
+			map->z_min = ft_atoi(parse_line[i]);
 		i++;
 	}
 	free_doublechar(parse_line);
@@ -59,7 +59,7 @@ void	check_map(t_map *map, char **argv)
 	while (gnl > 0)
 		gnl = check_line(fd, &line, map);
 	free(line);
-	if (close(fd) || gnl < 0 || (map->x_size == 1 && map->y_size == 1))
+	if (close(fd) || gnl < 0 || (map->x_size <= 1 && map->y_size <= 1))
 		quit(1, 0, 0);
 }
 
@@ -100,7 +100,7 @@ int	fill_xtab(int **tab, int fd, char **line, t_map map)
 		quit(1, tab, map.x_size);
 	i = -1;
 	while (++i < map.x_size)
-		tab[i][j] = atoi(parse_line[i]);
+		tab[i][j] = ft_atoi(parse_line[i]);
 	free_doublechar(parse_line);
 	parse_line = NULL;
 	j++;
