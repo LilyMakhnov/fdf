@@ -17,7 +17,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-# define BUFFER_SIZE 10
+# define BUFFER_SIZE 1000
 
 char	*ft_strduptochar(char *str, char a, size_t n);
 int		ft_strcpychar(char *str, char a);

@@ -64,13 +64,14 @@ typedef struct s_map
 	int			z_max;
 	int			z_min;
 	float		scale;
-	int			offset_x;
-	int			offset_y;
+	float			offset_x;
+	float			offset_y;
 	t_offset	offset;
 	t_point		pt1;
 	t_point		pt2;
 }	t_map;
 
+int	quit_mouse(t_env *param);
 //frame
 t_point			set_point(t_map map, int **tab, int i, int j);
 t_offset		shift_offset(int **tab, t_map map);

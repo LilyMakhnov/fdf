@@ -37,6 +37,16 @@ int	key_hook(int keycode, t_env *param)
 	return (0);
 }
 
+int	quit_mouse(t_env *param)
+{
+	mlx_destroy_image (param->mlx, param->img.img);
+	mlx_destroy_window (param->mlx, param->win);
+	mlx_destroy_display(param->mlx);
+	free(param->mlx);
+	exit(0);
+	return (0);
+}
+
 int	create_env(t_env *fdf, char *str)
 {
 	fdf->mlx = mlx_init();

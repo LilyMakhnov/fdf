@@ -33,7 +33,8 @@ int	main(int argc, char **argv)
 	draw_map(tab, map, &fdf.img);
 	free_tab(tab, map.x_size);
 	mlx_put_image_to_window(fdf.mlx, fdf.win, fdf.img.img, 0, 0);
-	mlx_key_hook (fdf.win, &key_hook, &fdf);
+	mlx_key_hook(fdf.win, &key_hook, &fdf);
+	mlx_hook(fdf.win, 33, 1L << 17, &quit_mouse, &fdf);
 	mlx_loop(fdf.mlx);
 	free_env(&fdf);
 	return (0);

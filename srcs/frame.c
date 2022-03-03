@@ -53,19 +53,27 @@ t_offset	shift_offset(int **tab, t_map map)
 	return (offset);
 }
 
+float	min_float(float a, float b)
+{
+	if (a < b)
+		return (a);
+	else
+		return (b);
+}
+
 void	ft_frame(int **tab, t_map *map)
 {
 	t_offset	off;
 
-	map->offset_x = WINDOW_WIDTH / 2;
-	map->offset_y = WINDOW_HEIGHT / 2;
+	map->offset_x = WINDOW_WIDTH / 2.0;
+	map->offset_y = WINDOW_HEIGHT / 2.0;
 	map->scale = 1;
 	off = shift_offset(tab, *map);
 	if (off.x_max != off.x_min && off.y_max != off.y_min)
-		map->scale = min(WINDOW_WIDTH / (off.x_max - off.x_min),
-				WINDOW_HEIGHT / (off.y_max - off.y_min)) * 0.80;
+		map->scale = min_float(WINDOW_WIDTH * 1.0 / (off.x_max - off.x_min),
+				WINDOW_HEIGHT * 1.0 / (off.y_max - off.y_min)) * 0.95;
 	if (map->scale < 1)
-		map->scale = 1;
+		map->scale = 1;	
 	off = shift_offset(tab, *map);
 	map->offset_x = 2 * map->offset_x - (off.x_max + off.x_min) / 2;
 	map->offset_y = 2 * map->offset_y - (off.y_max + off.y_min) / 2;
